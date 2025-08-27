@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family-Friendly Venues Map | Toddlers & Preschoolers</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .controls {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #dee2e6;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .filter-btn.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .filter-btn:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .legend-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .indoor { background-color: #3498db; }
+        .outdoor { background-color: #2ecc71; }
+        .fair { background-color: #e74c3c; }
+        .old-info { background-color: #f39c12; }
+
+        #map {
+            height: 70vh;
+            min-height: 500px;
+        }
+
+        .popup-content {
+            max-width: 300px;
+            font-family: inherit;
+        }
+
+        .popup-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+
+        .popup-info {
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .popup-events {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 8px 0;
+        }
+
+        .popup-events h4 {
+            color: #e74c3c;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        .popup-link {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .popup-link:hover {
+            text-decoration: underline;
+        }
+
+        .age-indicator {
+            background: #ff6b6b;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .old-info-badge {
+            background: #f39c12;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            margin-left: 5px;
+        }
+
+        .footer {
+            padding: 20px 30px;
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .legend {
+                justify-content: center;
+            }
+            
+            #map {
+                height: 60vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎪 Family Fun Map 🎪</h1>
+            <p>Indoor Play Places & Outdoor Adventures for Toddlers & Preschoolers (Ages 2-5)</p>
+            <p style="font-size: 1rem; margin-top: 5px;">Merrimack Valley, MA to Bloomfield, CT & Surrounding Areas</p>
+        </div>
+
+        <div class="controls">
+            <div class="filter-group">
+                <label>Show:</label>
+                <button class="filter-btn active" data-type="all">All Venues</button>
+                <button class="filter-btn" data-type="indoor">Indoor Play</button>
+                <button class="filter-btn" data-type="outdoor">Outdoor Fun</button>
+                <button class="filter-btn" data-type="fair">Fairs & Events</button>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-icon indoor"></div>
+                    <span>Indoor Play Places</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-icon outdoor"></div>
+                    <span>Outdoor Venues</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-icon fair"></div>
+                    <span>Fairs & Events</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-icon old-info"></div>
+                    <span>⏰ Info 1+ year old</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="map"></div>
+
+        <div class="footer">
+            <p><strong>Last Updated:</strong> August 27, 2025 | <strong>Note:</strong> Always verify hours, events, and pricing directly with venues before visiting.</p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script>
+        // Initialize the map
+        const map = L.map('map').setView([42.0, -71.5], 9);
+
+        // Add tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Define custom icons
+        const createIcon = (color, isOld = false) => {
+            const icon = L.divIcon({
+                className: 'custom-marker',
+                html: `<div style="background-color: ${color}; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3); position: relative;">
+                    ${isOld ? '<div style="position: absolute; top: -5px; right: -5px; background: #f39c12; width: 10px; height: 10px; border-radius: 50%; border: 1px solid white;"></div>' : ''}
+                </div>`,
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+            });
+            return icon;
+        };
+
+        const indoorIcon = createIcon('#3498db');
+        const outdoorIcon = createIcon('#2ecc71');
+        const fairIcon = createIcon('#e74c3c');
+        const oldIndoorIcon = createIcon('#3498db', true);
+        const oldOutdoorIcon = createIcon('#2ecc71', true);
+
+        // Venue data
+        const venues = [
+            // INDOOR VENUES - MASSACHUSETTS
+            {
+                name: "Boston Children's Museum",
+                lat: 42.3519, lng: -71.0495,
+                type: "indoor",
+                city: "Boston, MA",
+                ages: "0-10",
+                description: "World-class children's museum with PlaySpace for ages 0-3, Japanese House, hands-on exhibits, and interactive learning areas.",
+                events: "PlaySpace for babies/toddlers, rotating exhibits, educational programs, special events",
+                website: "https://bostonchildrensmuseum.org/",
+                isOld: false
+            },
+            {
+                name: "Discovery Museum",
+                lat: 42.4851, lng: -71.4416,
+                type: "indoor",
+                city: "Acton, MA",
+                ages: "0-12",
+                description: "Hands-on STEAM museum with outdoor treehouse and nature playscape on 4.5 acres.",
+                events: "Free Friday nights 4:30-8pm through Labor Day, Special exhibits rotating seasonally",
+                website: "https://www.discoveryacton.org/",
+                isOld: false
+            },
+            {
+                name: "Little Lovage Club",
+                lat: 42.3467, lng: -71.0823,
+                type: "indoor",
+                city: "Boston, MA (Prudential Center)",
+                ages: "0-6",
+                description: "Indoor play space with climbing structures, dress-up area, book nook, baby exploration space, and movement zone for toddlers.",
+                events: "Open play sessions, moving to new location soon",
+                website: "https://www.littlelovageclub.com/",
+                isOld: false
+            },
+            {
+                name: "Jump on In Boston",
+                lat: 42.3867, lng: -71.1400,
+                type: "indoor",
+                city: "Somerville, MA",
+                ages: "All ages",
+                description: "Large warehouse with enormous inflatable slides and castles, perfect for burning energy. Reservations recommended.",
+                events: "Open bounce sessions, birthday parties, toddler-friendly inflatables",
+                website: "https://www.jumponinboston.com/",
+                isOld: false
+            },
+            {
+                name: "Boston Playground",
+                lat: 42.3973, lng: -71.0275,
+                type: "indoor",
+                city: "Chelsea, MA",
+                ages: "0-10",
+                description: "Indoor playground with creative, physical, screen-free fun. Climbing structures, slides, and active play areas.",
+                events: "Drop-in play sessions, birthday parties, toddler time",
+                website: "https://www.bostonplayground.com/",
+                isOld: false
+            },
+            {
+                name: "Cowabungas",
+                lat: 42.5751, lng: -71.1287,
+                type: "indoor",
+                city: "North Reading, MA",
+                ages: "2-12",
+                description: "Tropical-themed indoor playground with inflatables, Toddler Tiki Island for ages 4 and under.",
+                events: "Open play sessions, birthday parties available",
+                website: "https://www.cowabungas.com/",
+                isOld: true
+            },
+            {
+                name: "North Shore Children's Museum",
+                lat: 42.5278, lng: -70.9286,
+                type: "indoor",
+                city: "Peabody, MA",
+                ages: "2-10",
+                description: "15 hands-on exhibits focused on sensory play and gross motor skills for young children.",
+                events: "Rotating special events and educational programs",
+                website: "https://www.nschildrensmuseum.org/",
+                isOld: false
+            },
+            {
+                name: "Launch Trampoline Park",
+                lat: 42.7262, lng: -71.1912,
+                type: "indoor",
+                city: "Methuen, MA",
+                ages: "All ages",
+                description: "Trampoline park with dodgeball, basketball hoops, foam pits. Special toddler times for ages 5 and under.",
+                events: "Weekly toddler time sessions, birthday parties",
+                website: "https://launchtrampolinepark.com/methuen/",
+                isOld: false
+            },
+            {
+                name: "Loch Ness Playcenter",
+                lat: 42.6279, lng: -71.3673,
+                type: "indoor",
+                city: "Chelmsford, MA",
+                ages: "Infants-12",
+                description: "Indoor play space with wooden castle, bouncy house, obstacle course, and soft-play area for babies/toddlers.",
+                events: "Open play, birthday parties, special events",
+                website: "https://lochness-playcenter.com/",
+                isOld: true
+            },
+            {
+                name: "Monkey Joe's",
+                lat: 42.5751, lng: -70.9534,
+                type: "indoor",
+                city: "Danvers, MA",
+                ages: "2-12",
+                description: "Large indoor space with bounce houses, inflatable slides, and obstacle courses. Dedicated bounce house for toddlers/preschoolers.",
+                events: "Open bounce sessions, special toddler times, birthday parties",
+                website: "https://www.monkeyjoes.com/danvers/",
+                isOld: true
+            },
+            {
+                name: "Sky Zone Danvers",
+                lat: 42.5751, lng: -70.9534,
+                type: "indoor",
+                city: "Danvers, MA",
+                ages: "2+",
+                description: "Indoor trampoline park with foam pits, ninja warrior course. Special toddler times for ages 5 and under.",
+                events: "Toddler time sessions, birthday parties, special events",
+                website: "https://www.skyzone.com/danvers/",
+                isOld: false
+            },
+            {
+                name: "Barnyard Playard",
+                lat: 42.2793, lng: -71.4162,
+                type: "indoor",
+                city: "Framingham, MA",
+                ages: "0-8",
+                description: "Indoor/outdoor playground with farm animals. Newly opened indoor space with play kitchen, bounce house, ride-on toys.",
+                events: "Barnyard Adventure Playgroups Mondays & Thursdays, birthday parties",
+                website: "https://pilgrimdaycamp.org/family-center-home/indoor-playground-center/",
+                isOld: false
+            },
+            {
+                name: "Cedarland (aMAZEment Action)",
+                lat: 42.7762, lng: -71.0773,
+                type: "indoor",
+                city: "Haverhill, MA",
+                ages: "2-12",
+                description: "Giant indoor play maze with Triple Wave Slide, Sports Court, Multi-Level Tube Slides, separate toddler/baby sections.",
+                events: "Open play, birthday parties, group events",
+                website: "https://www.cedarland.com/",
+                isOld: false
+            },
+
+            // INDOOR VENUES - CONNECTICUT
+            {
+                name: "The Children's Museum",
+                lat: 41.7658, lng: -72.7420,
+                type: "indoor",
+                city: "West Hartford, CT",
+                ages: "2-12",
+                description: "Hands-on science and nature museum with interactive labs, workshops, live wildlife sanctuary, digital planetarium.",
+                events: "Nano World exhibit, updated Toddler room, vacation camps, birthday parties",
+                website: "https://www.thechildrensmuseumct.org/",
+                isOld: false
+            },
+            {
+                name: "Connecticut Science Center",
+                lat: 41.7637, lng: -72.6851,
+                type: "indoor",
+                city: "Hartford, CT",
+                ages: "All ages",
+                description: "Interactive science museum with hands-on exhibits, perfect for curious toddlers and preschoolers.",
+                events: "Rotating special exhibitions, IMAX theater, educational programs",
+                website: "https://www.ctsciencecenter.org/",
+                isOld: false
+            },
+
+            // OUTDOOR VENUES - MASSACHUSETTS  
+            {
+                name: "Davis Farmland",
+                lat: 42.3531, lng: -71.8023,
+                type: "outdoor",
+                city: "Sterling, MA",
+                ages: "All ages",
+                description: "Paradise for kids with livestock, hayrides, pony rides, massive water spray ground. Fall: Davis Mega Farm Festival with corn mazes and pumpkins.",
+                events: "Davis Mega Farm Festival (fall), PYO activities, animal interactions, special Finn sheep sextuplets born April 2025",
+                website: "https://www.davisfarmland.com/",
+                isOld: false
+            },
+            {
+                name: "Drumlin Farm Wildlife Sanctuary",
+                lat: 42.4373, lng: -71.2640,
+                type: "outdoor",
+                city: "Lincoln, MA",
+                ages: "All ages",
+                description: "Mass Audubon working farm and wildlife sanctuary. Farm animals, trails through forest/field/wetlands, nature play area.",
+                events: "Forest Discovery Trail, Learning Garden, hayrides, baby animals in spring, nature programs",
+                website: "https://www.massaudubon.org/places-to-explore/wildlife-sanctuaries/drumlin-farm",
+                isOld: false
+            },
+            {
+                name: "Franklin Park Zoo",
+                lat: 42.3026, lng: -71.0851,
+                type: "outdoor",
+                city: "Boston, MA", 
+                ages: "All ages",
+                description: "Zoo with Tropical Forest (gorillas, lemurs), Giraffe Savannah, nature play area perfect for toddlers.",
+                events: "Seasonal animal programs, educational activities, special exhibits",
+                website: "https://www.zoonewengland.org/franklin-park-zoo/",
+                isOld: false
+            },
+            {
+                name: "Southwick's Zoo",
+                lat: 42.0037, lng: -71.5640,
+                type: "outdoor",
+                city: "Mendon, MA",
+                ages: "All ages", 
+                description: "New England's largest zoo with 850+ animals, Skyfari aerial tram, walk-through deer forest, hand-feed giraffes.",
+                events: "Educational programs, seasonal events, giraffe feeding experiences",
+                website: "https://www.southwickszoo.com/",
+                isOld: false
+            },
+            {
+                name: "Buttonwood Park Zoo",
+                lat: 41.6362, lng: -70.9342,
+                type: "outdoor",
+                city: "New Bedford, MA",
+                ages: "All ages",
+                description: "Small zoo with North American wildlife, river otters, black bears, elephants. Zoo train, playground, accessible trails.",
+                events: "Interactive programs, educational activities, seasonal events",
+                website: "https://www.bpzoo.org/",
+                isOld: false
+            },
+            {
+                name: "The Zoo in Forest Park",
+                lat: 42.0977, lng: -72.5617,
+                type: "outdoor", 
+                city: "Springfield, MA",
+                ages: "All ages",
+                description: "Zoo specializing in rescued animals within large urban park. Easy-to-navigate space with meaningful animal stories.",
+                events: "Animal Tales programs (July-August), educational presentations",
+                website: "https://www.forestparkzoo.org/",
+                isOld: false
+            },
+            {
+                name: "World's End",
+                lat: 42.2537, lng: -70.8665,
+                type: "outdoor",
+                city: "Hingham, MA", 
+                ages: "All ages",
+                description: "Trustees property with 10 miles of family-friendly carriage paths, spectacular harbor views, rolling hills perfect for toddlers.",
+                events: "Family programs, easy walks, kite flying, picnicking areas",
+                website: "https://thetrustees.org/place/worlds-end/",
+                isOld: false
+            },
+            {
+                name: "deCordova Sculpture Park",
+                lat: 42.4640, lng: -71.2836,
+                type: "outdoor",
+                city: "Lincoln, MA", 
+                ages: "All ages",
+                description: "Trustees property with outdoor sculptures in landscape setting, 30 acres of trails, art and nature combined.",
+                events: "Art exhibitions, family programs, outdoor sculpture exploration",
+                website: "https://thetrustees.org/place/decordova-sculpture-park-and-museum/",
+                isOld: false
+            },
+            {
+                name: "Robbins Farm Park",
+                lat: 42.4184, lng: -71.1562,
+                type: "outdoor",
+                city: "Arlington, MA", 
+                ages: "All ages",
+                description: "Huge playground with super long slides built into hillside, separate areas for toddlers/older kids, Boston skyline views.",
+                events: "Open year-round, great for kite flying, viewing Boston fireworks",
+                website: "https://www.arlingtonma.gov/departments/parks-recreation/parks-facilities/robbins-farm-park",
+                isOld: true
+            },
+            {
+                name: "Arsenal Park",
+                lat: 42.3656, lng: -71.1628,
+                type: "outdoor",
+                city: "Watertown, MA",
+                ages: "All ages", 
+                description: "Beautiful green space on Charles River with separate playground areas for different ages, water features, picnic space.",
+                events: "Open year-round, walking/biking paths, ball fields available",
+                website: "https://www.watertown-ma.gov/",
+                isOld: true
+            },
+            {
+                name: "Esplanade Playgrounds",
+                lat: 42.3601, lng: -71.0742,
+                type: "outdoor",
+                city: "Boston, MA",
+                ages: "All ages",
+                description: "Multiple playgrounds along Charles River including newly renovated Gronk Playground (2025). Separate toddler and older kid areas.",
+                events: "Open year-round, connects to walking/biking paths, near Hatch Shell events",
+                website: "https://esplanade.org/playgrounds/",
+                isOld: false
+            },
+            {
+                name: "Martin's Park",
+                lat: 42.3519, lng: -71.0495,
+                type: "outdoor",
+                city: "Boston, MA",
+                ages: "All ages",
+                description: "Harborfront park with playground, perfect for stretching legs during city visits, great harbor views.",
+                events: "Open year-round, accessible playground equipment, harbor activities nearby",
+                website: "https://www.boston.gov/parks/martins-park",
+                isOld: false
+            },
+            {
+                name: "Breakheart Reservation",
+                lat: 42.4781, lng: -71.0065,
+                type: "outdoor",
+                city: "Saugus, MA",
+                ages: "All ages",
+                description: "State park with swimming lake, clean beach, playground, well-marked hiking trails that are toddler-friendly and not too hilly.",
+                events: "Swimming season, family activities organized by Friends of Breakheart, hiking programs",
+                website: "https://www.mass.gov/locations/breakheart-reservation",
+                isOld: false
+            },
+            {
+                name: "Hopkinton State Park",
+                lat: 42.2287, lng: -71.5268,
+                type: "outdoor",
+                city: "Hopkinton, MA",
+                ages: "All ages",
+                description: "State park with swimming, boating, 300+ picnic spots with grills, hiking trails. Just 40 minutes from Boston.",
+                events: "Swimming season (late May-Labor Day), kayak/paddleboard rentals, picnicking",
+                website: "https://www.mass.gov/locations/hopkinton-state-park",
+                isOld: false
+            },
+            {
+                name: "Mary Cummings Park",
+                lat: 42.5024, lng: -71.1545,
+                type: "outdoor",
+                city: "Burlington/Woburn, MA",
+                ages: "All ages",
+                description: "216-acre Trustees park with wheelchair-accessible Pollinator Trail, meadows, wetlands, picnic tables.",
+                events: "0.8-mile accessible loop trail, family programs, nature exploration",
+                website: "https://thetrustees.org/place/mary-cummings-park/",
+                isOld: false
+            },
+
+            // OUTDOOR VENUES - CONNECTICUT
+            {
+                name: "Roaring Brook Nature Center", 
+                lat: 41.8345, lng: -72.9023,
+                type: "outdoor",
+                city: "Canton, CT",
+                ages: "All ages",
+                description: "Environmental exhibits, nature programs, concerts, acres of hiking, bird watching. Part of Children's Museum group.",
+                events: "Nature programs, seasonal concerts, winter cross-country skiing",
+                website: "https://www.thechildrensmuseumct.org/roaring-brook/",
+                isOld: false
+            },
+            {
+                name: "Westmoor Park",
+                lat: 41.7658, lng: -72.7420,
+                type: "outdoor", 
+                city: "West Hartford, CT",
+                ages: "All ages",
+                description: "162-acre park with farm animals (horses, pigs, chickens, goats, llamas), wildflower meadows, woodland trails.",
+                events: "Educational programming, open daily for animal viewing (no feeding/petting allowed)",
+                website: "https://www.westhartfordct.gov/",
+                isOld: false
+            },
+
+            // SOUTH SHORE MASSACHUSETTS VENUES
+            {
+                name: "Billy Beez",
+                lat: 42.0431, lng: -70.7264,
+                type: "indoor",
+                city: "Kingston, MA (South Shore Plaza)",
+                ages: "All ages",
+                description: "Rainbow side-by-side slides, giant jungle gym with tunnels, sports courts, ballistics arena. South Shore mall location.",
+                events: "Open play sessions, birthday parties, racing down colorful slides",
+                website: "https://billybeez.com/",
+                isOld: false
+            },
+            {
+                name: "Toddler Town",
+                lat: 42.2529, lng: -71.0275,
+                type: "indoor",
+                city: "Quincy, MA",
+                ages: "0-6",
+                description: "Enormous indoor playground designed as VIP space for tots. Climbing structures, slides, play areas sized for little ones.",
+                events: "Open play sessions, special toddler programs, birthday parties",
+                website: "https://www.toddlertownquincy.com/",
+                isOld: true
+            },
+            {
+                name: "Kids World at South Shore Sports Center",
+                lat: 42.1431, lng: -70.8964,
+                type: "indoor",
+                city: "Hanover, MA",
+                ages: "1-6",
+                description: "Indoor play space with bouncy structures, ride-on toys, balls, trucks. Located within sports complex.",
+                events: "Open play Mon-Sat 9:30am-1pm, birthday parties, social play",
+                website: "https://sssc.community/our-activities/kids-world/",
+                isOld: false
+            },
+            {
+                name: "KidZone",
+                lat: 42.1943, lng: -70.8264,
+                type: "indoor",
+                city: "Norwell, MA",
+                ages: "2-12",
+                description: "Jumping, climbing, obstacle courses. Recently under new management with memberships available.",
+                events: "Open play (hours vary by day), birthday parties, active play sessions",
+                website: "https://kidzonenorwell.com/",
+                isOld: false
+            },
+            {
+                name: "Children's World Indoor Playground",
+                lat: 42.2529, lng: -71.0275,
+                type: "indoor",
+                city: "Quincy, MA",
+                ages: "0-12",
+                description: "Bouncy houses, bikes, scooters, ride-on toys, dramatic play area, train table, dome climber, special toddler area.",
+                events: "Open play daily (when no private parties), birthday parties",
+                website: "https://www.childrensworldplayground.com/",
+                isOld: true
+            },
+            {
+                name: "Altitude Trampoline Park",
+                lat: 42.1278, lng: -71.0364,
+                type: "indoor",
+                city: "Avon, MA",
+                ages: "All ages",
+                description: "Wall-to-wall trampolines, high-performance zones, kids court, 20' rock wall with foam pit, battle beam, gymnastics areas.",
+                events: "Special toddler times during weekdays, birthday parties, dodgeball",
+                website: "https://www.altitudetrampolinepark.com/avon/",
+                isOld: false
+            },
+            {
+                name: "South Shore Natural Science Center - EcoZone",
+                lat: 42.1943, lng: -70.8264,
+                type: "indoor",
+                city: "Norwell, MA",
+                ages: "All ages",
+                description: "Interactive exhibit exploring Wetlands, Woodland, Meadow and Tidal Zone ecosystems of southeastern MA.",
+                events: "Open 7 days/week, educational programs, nature exploration",
+                website: "https://www.ssnerr.org/",
+                isOld: false
+            },
+            {
+                name: "South Shore Plaza Play Area",
+                lat: 42.1778, lng: -71.0181,
+                type: "indoor",
+                city: "Braintree, MA",
+                ages: "All ages",
+                description: "S.T.E.A.M.-powered play area in mall food court. Math tile table, science climbing structure, engineering wonder wall.",
+                events: "Free play during mall hours, educational S.T.E.A.M. activities",
+                website: "https://www.simon.com/mall/south-shore-plaza/stores/play-area",
+                isOld: false
+            },
+
+            // PROVIDENCE & RHODE ISLAND VENUES
+            {
+                name: "Providence Children's Museum",
+                lat: 41.8194, lng: -71.4131,
+                type: "indoor",
+                city: "Providence, RI",
+                ages: "All ages",
+                description: "Champions of play! Hands-on exhibits, water tables with smocks, interactive learning spaces, creativity and exploration focus.",
+                events: "40+ years of programming, educational activities, special exhibits, family events",
+                website: "https://providencechildrensmuseum.org/",
+                isOld: false
+            },
+            {
+                name: "Roger Williams Park Zoo",
+                lat: 41.7964, lng: -71.4165,
+                type: "outdoor",
+                city: "Providence, RI",
+                ages: "All ages",
+                description: "One of oldest zoos in US with 160+ species. African elephants, snow leopards, red pandas, Alex and Ani Farmyard for hands-on animal experiences.",
+                events: "Animal encounters, feeding experiences, educational programs, Soaring Eagle zip ride",
+                website: "https://www.rwpzoo.org/",
+                isOld: false
+            },
+            {
+                name: "Fab-YOU-Us Family Fun Center",
+                lat: 41.8506, lng: -71.4775,
+                type: "indoor",
+                city: "North Providence, RI",
+                ages: "All ages",
+                description: "Drop-in music, dance, arts & crafts, movement classes. Both drop-off and stay-and-play options available.",
+                events: "Music classes, dance classes, arts & crafts sessions, movement activities",
+                website: "https://fabyouusfun.com/",
+                isOld: false
+            },
+            {
+                name: "The Sensory Play Place",
+                lat: 41.9237, lng: -71.5495,
+                type: "indoor",
+                city: "Smithfield, RI",
+                ages: "0.5-6",
+                description: "Indoor play space promoting sensory-based play experiences for babies through preschoolers.",
+                events: "Open play times (check website), sensory activities, toddler programs",
+                website: "https://thesensoryplayplace.com/",
+                isOld: false
+            },
+            {
+                name: "Play Time RI",
+                lat: 41.9237, lng: -71.5495,
+                type: "indoor",
+                city: "Smithfield, RI",
+                ages: "0.5-6",
+                description: "Indoor play space designed specifically for babies through preschoolers. Drop-in times available.",
+                events: "Drop-in play times (hours vary), toddler-focused activities",
+                website: "https://playtimeri.com/",
+                isOld: false
+            },
+            {
+                name: "Rock Spot Climbing",
+                lat: 41.9022, lng: -71.4349,
+                type: "indoor",
+                city: "Lincoln, RI",
+                ages: "All ages",
+                description: "Rock climbing for all ages. Day passes or weekly classes available. Another location in Providence.",
+                events: "Kids climbing classes, family climbing sessions, birthday parties",
+                website: "https://rockspotclimbing.com/lincoln/",
+                isOld: false
+            },
+
+            // RHODE ISLAND STATE PARKS & BEACHES
+            {
+                name: "Goddard Memorial State Park",
+                lat: 41.6645, lng: -71.4678,
+                type: "outdoor",
+                city: "Warwick, RI",
+                ages: "All ages",
+                description: "472 acres with sandy beach, 9-hole golf course, 11 game fields, 18 miles bridle trails, 355 picnic tables. Sunset views.",
+                events: "Beach swimming (seasonal lifeguard), horseback riding, concerts, equestrian shows",
+                website: "https://riparks.ri.gov/locations/goddard",
+                isOld: false
+            },
+            {
+                name: "Colt State Park",
+                lat: 41.6442, lng: -71.3020,
+                type: "outdoor",
+                city: "Bristol, RI",
+                ages: "All ages",
+                description: "'Gem' of RI State Parks. Western border opens to Narragansett Bay panorama. Walking trails, bike paths.",
+                events: "Open dawn to dusk, scenic bay views, picnicking, walking/biking trails",
+                website: "https://riparks.ri.gov/locations/colt",
+                isOld: false
+            },
+            {
+                name: "Misquamicut State Beach",
+                lat: 41.3181, lng: -71.8201,
+                type: "outdoor",
+                city: "Westerly, RI",
+                ages: "All ages",
+                description: "Over half-mile beachfront, popular with families. Modern pavilion, playground, shade gazebos, gentle surf.",
+                events: "Swimming season with lifeguards, playground activities, beach pavilion amenities",
+                website: "https://riparks.ri.gov/locations/misquamicut",
+                isOld: false
+            },
+            {
+                name: "Roger Wheeler State Beach (Salty Brine)",
+                lat: 41.3665, lng: -71.5401,
+                type: "outdoor",
+                city: "Narragansett, RI",
+                ages: "All ages",
+                description: "Popular with families with small children. Calm, shallow water. Playground, modern pavilion, great for little ones.",
+                events: "Seasonal lifeguards, playground activities, calm water perfect for toddlers",
+                website: "https://riparks.ri.gov/locations/roger-wheeler",
+                isOld: false
+            },
+            {
+                name: "Easton's Beach (First Beach)",
+                lat: 41.4778, lng: -71.2961,
+                type: "outdoor",
+                city: "Newport, RI",
+                ages: "All ages",
+                description: "Newport's largest public beach. Historic carousel, playground, seaside aquarium. Adjacent to Cliff Walk start.",
+                events: "Family Night with live band (Tuesdays), Children's Night entertainment (Thursdays July-Aug)",
+                website: "https://www.cityofnewport.com/departments/recreation/beaches-facilities",
+                isOld: false
+            },
+
+            // MA-RI BORDER AREA VENUES
+            {
+                name: "Kidz Wurld",
+                lat: 41.9706, lng: -71.3381,
+                type: "indoor",
+                city: "North Attleboro, MA",
+                ages: "1-10",
+                description: "Slides, inflatable jump houses, kitchen/grocery play tables, cozy cars, arcade games, mini golf, food offerings.",
+                events: "Open play sessions, birthday parties, mini golf, family-sized bathrooms with changing tables",
+                website: "https://kidzwurld.com/",
+                isOld: false
+            },
+            {
+                name: "Children's Museum of Greater Fall River",
+                lat: 41.7015, lng: -71.1550,
+                type: "indoor",
+                city: "Fall River, MA",
+                ages: "2-12",
+                description: "Hands-on exhibits, interactive learning experiences, STEAM activities for young learners.",
+                events: "Educational programs, rotating exhibits, family activities",
+                website: "https://cmgfr.org/",
+                isOld: false
+            },
+
+            // MAJOR FAIRS & FESTIVALS
+            {
+                name: "The Big E",
+                lat: 42.1015, lng: -72.6398,
+                type: "fair",
+                city: "West Springfield, MA",
+                ages: "All ages",
+                description: "New England's largest fair (Sept 12-28, 2025). Multi-state fair with rides, food, agriculture, entertainment.",
+                events: "Circus Spectacular (3 daily shows), The Big Parade (daily 6pm), Avenue of States, concerts, agricultural exhibits",
+                website: "https://www.thebige.com/",
+                isOld: false
+            },
+            {
+                name: "Brooklyn Fair",
+                lat: 41.7940, lng: -71.9440,
+                type: "fair",
+                city: "Brooklyn, CT", 
+                ages: "All ages",
+                description: "One of the oldest continuously run fairs in the US (Aug 21-24, 2025). Fireworks, racing pigs, kids' stage.",
+                events: "Baking contests, truck pull, animal competitions, entire kids' stage with activities",
+                website: "https://www.brooklynfair.org/",
+                isOld: false
+            },
+            {
+                name: "Woodstock Fair",
+                lat: 41.9518, lng: -71.9674,
+                type: "fair",
+                city: "Woodstock, CT",
+                ages: "All ages", 
+                description: "Labor Day tradition (Aug 28-Sept 1, 2025). Agricultural exhibits, birthing center, entertainment, carnival rides.",
+                events: "Agricultural competitions, entertainment, music, food, carnival rides, educational exhibits",
+                website: "https://www.woodstockfair.com/",
+                isOld: false
+            },
+            {
+                name: "Connecticut Renaissance Faire",
+                lat: 41.6521, lng: -72.2173,
+                type: "fair",
+                city: "Lebanon, CT",
+                ages: "All ages",
+                description: "Weekends Aug 30-Oct 19, 2025. 16th-century harvest festival with 100+ artisan shops, 12 stages of entertainment.",
+                events: "Jousting, interactive shows, kids can become knights, live entertainment, handcrafted goods",
+                website: "https://ctfaire.com/",
+                isOld: false
+            },
+            {
+                name: "Wolcott Country Fair", 
+                lat: 41.6029, lng: -72.9851,
+                type: "fair",
+                city: "Wolcott, CT",
+                ages: "All ages",
+                description: "Area's largest agricultural event (Aug 8-10, 2025). 30,000+ attendees, traditional country fair activities.",
+                events: "Antique farm equipment, tractor pulls, pig racing, thrill rides, food, entertainment",
+                website: "https://www.wolcottfair.com/",
+                isOld: false
+            }
+        ];
+
+        // Store all markers for filtering
+        let allMarkers = [];
+
+        // Add markers to map
+        venues.forEach(venue => {
+            let icon;
+            if (venue.type === 'indoor') {
+                icon = venue.isOld ? oldIndoorIcon : indoorIcon;
+            } else if (venue.type === 'outdoor') {
+                icon = venue.isOld ? oldOutdoorIcon : outdoorIcon;
+            } else {
+                icon = fairIcon;
+            }
+
+            const marker = L.marker([venue.lat, venue.lng], { icon: icon }).addTo(map);
+            
+            const oldBadge = venue.isOld ? '<span class="old-info-badge">⏰ 1+ yr old info</span>' : '';
+            
+            const popupContent = `
+                <div class="popup-content">
+                    <div class="popup-title">${venue.name}${oldBadge}</div>
+                    <div class="popup-info">
+                        <strong>📍</strong> ${venue.city}<br>
+                        <strong>👶</strong> <span class="age-indicator">Ages ${venue.ages}</span><br>
+                        <strong>📝</strong> ${venue.description}
+                    </div>
+                    ${venue.events ? `
+                    <div class="popup-events">
+                        <h4>🎪 Current Events & Activities:</h4>
+                        <div style="font-size: 12px;">${venue.events}</div>
+                    </div>
+                    ` : ''}
+                    <div style="margin-top: 10px;">
+                        <a href="${venue.website}" target="_blank" class="popup-link">🌐 Visit Website</a>
+                    </div>
+                </div>
+            `;
+            
+            marker.bindPopup(popupContent);
+            marker.venueType = venue.type;
+            allMarkers.push(marker);
+        });
+
+        // Filter functionality
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // Update active button
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                const filterType = e.target.dataset.type;
+                
+                // Show/hide markers
+                allMarkers.forEach(marker => {
+                    if (filterType === 'all' || marker.venueType === filterType) {
+                        marker.addTo(map);
+                    } else {
+                        map.removeLayer(marker);
+                    }
+                });
+            });
+        });
+
+        // Fit map to show all markers
+        const group = new L.featureGroup(allMarkers);
+        map.fitBounds(group.getBounds().pad(0.1));
+    </script>
+</body>
+</html>
