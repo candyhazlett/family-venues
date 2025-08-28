@@ -1841,7 +1841,7 @@
             }
         }
         function createVenueCard(venue, index) {
-            const oldIndicator = venue.isOld ? '<span class="old-info-indicator">⏰ 1+ yr old</span>' : '';
+            const oldIndicator = venue.isOld ? '<span class="old-info-indicator">⏰ last update 12+ months ago </span>' : '';
             const typeText = venue.type === 'indoor' ? 'Indoor' : venue.type === 'outdoor' ? 'Outdoor' : 'Fair/Event';
 
             return `
@@ -1878,7 +1878,7 @@
 
             const marker = L.marker([venue.lat, venue.lng], { icon: icon }).addTo(map);
 
-            const oldBadge = venue.isOld ? '<span class="old-info-badge">⏰ 1+ yr old info</span>' : '';
+            const oldBadge = venue.isOld ? '<span class="old-info-badge">⏰ last update 12+ months ago </span>' : '';
 
             const popupContent = `
                 <div class="popup-content">
