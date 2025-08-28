@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Family-Friendly Venues Map | Toddlers & Preschoolers</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+    <title>Family-Friendly Venues Map v4.1 - Toddlers & Preschoolers</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
 
         body {
@@ -22,17 +22,17 @@
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             overflow: hidden;
         }
 
         .header {
-            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            color: white;
             padding: 30px;
             text-align: center;
-            color: white;
         }
 
         .header h1 {
@@ -42,39 +42,70 @@
         }
 
         .header p {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             opacity: 0.9;
         }
 
         .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding: 20px 30px;
             background: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
-            display: flex;
+            border-bottom: 1px solid #dee2e6;
             flex-wrap: wrap;
             gap: 15px;
-            align-items: center;
         }
 
-        .filter-group {
+        .filter-buttons {
             display: flex;
             gap: 10px;
-            align-items: center;
+            flex-wrap: wrap;
         }
 
-        .filter-group label {
-            font-weight: 600;
+        .sort-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
             color: #495057;
+        }
+
+        .sort-control select {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+            min-width: 120px;
+        }
+
+        .sort-control select:hover {
+            border-color: #007bff;
+        }
+
+        .sort-control select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
         }
 
         .filter-btn {
             padding: 8px 16px;
             border: 2px solid #dee2e6;
             background: white;
-            border-radius: 25px;
+            border-radius: 20px;
             cursor: pointer;
+            font-weight: 500;
             transition: all 0.3s ease;
             font-size: 14px;
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .filter-btn.active {
@@ -83,74 +114,223 @@
             border-color: #007bff;
         }
 
-        .filter-btn:hover {
-            border-color: #007bff;
-            transform: translateY(-2px);
-        }
-
         .legend {
             display: flex;
             gap: 20px;
-            flex-wrap: wrap;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
             font-size: 14px;
+            color: #666;
         }
 
         .legend-icon {
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             border: 2px solid white;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
-        .indoor { background-color: #3498db; }
-        .outdoor { background-color: #2ecc71; }
-        .fair { background-color: #e74c3c; }
-        .old-info { background-color: #f39c12; }
+        .legend-icon.indoor { background-color: #3498db; }
+        .legend-icon.outdoor { background-color: #2ecc71; }
+        .legend-icon.fair { background-color: #e74c3c; }
+        .legend-icon.old { opacity: 0.6; }
 
-        #map {
+        .map-container {
+            display: flex;
             height: 70vh;
             min-height: 500px;
+            gap: 20px;
+            padding: 20px;
         }
 
-        .popup-content {
-            max-width: 300px;
-            font-family: inherit;
+        #map {
+            flex: 2;
+            height: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .popup-title {
+        .venue-list {
+            flex: 1;
+            height: 100%;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .venue-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .venue-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .venue-list::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .venue-list::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        .venue-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid #dee2e6;
+        }
+
+        .venue-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .venue-card.indoor {
+            border-left-color: #3498db;
+        }
+
+        .venue-card.outdoor {
+            border-left-color: #2ecc71;
+        }
+
+        .venue-card.fair {
+            border-left-color: #e74c3c;
+        }
+
+        .venue-card.old-info {
+            opacity: 0.8;
+        }
+
+        .venue-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+            gap: 8px;
+        }
+
+        .venue-card-title {
             font-size: 16px;
             font-weight: bold;
             color: #2c3e50;
+            margin: 0;
+            line-height: 1.2;
+            flex: 1;
+        }
+
+        .venue-card-type {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .venue-card-type.indoor {
+            background-color: #3498db;
+        }
+
+        .venue-card-type.outdoor {
+            background-color: #2ecc71;
+        }
+
+        .venue-card-type.fair {
+            background-color: #e74c3c;
+        }
+
+        .venue-card-city {
+            font-size: 14px;
+            color: #666;
             margin-bottom: 8px;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .venue-card-ages {
+            font-size: 12px;
+            background: #ff6b6b;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .venue-card-link {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .venue-card-link:hover {
+            text-decoration: underline;
+        }
+
+        .old-info-indicator {
+            background: #f39c12;
+            color: white;
+            padding: 1px 6px;
+            border-radius: 8px;
+            font-size: 10px;
+            margin-left: 5px;
+        }
+
+        .venue-count {
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Popup Styles */
+        .popup-content {
+            max-width: 280px;
+        }
+
+        .popup-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
         }
 
         .popup-info {
-            font-size: 14px;
+            margin-bottom: 10px;
             line-height: 1.4;
-            margin-bottom: 8px;
         }
 
         .popup-events {
             background: #f8f9fa;
             padding: 10px;
             border-radius: 8px;
-            margin: 8px 0;
+            margin: 10px 0;
         }
 
         .popup-events h4 {
-            color: #e74c3c;
             margin-bottom: 5px;
-            font-size: 13px;
+            color: #e74c3c;
         }
 
         .popup-link {
@@ -168,121 +348,128 @@
             color: white;
             padding: 2px 8px;
             border-radius: 12px;
-            font-size: 11px;
-            font-weight: bold;
+            font-size: 12px;
         }
 
         .old-info-badge {
             background: #f39c12;
             color: white;
-            padding: 2px 6px;
-            border-radius: 10px;
-            font-size: 10px;
-            margin-left: 5px;
-        }
-
-        .footer {
-            padding: 20px 30px;
-            background: #2c3e50;
-            color: white;
-            text-align: center;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: 10px;
         }
 
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2rem;
             }
-            
+
             .controls {
                 flex-direction: column;
                 align-items: flex-start;
+                gap: 20px;
             }
-            
+
+            .filter-buttons {
+                order: 1;
+            }
+
+            .sort-control {
+                order: 2;
+            }
+
             .legend {
                 justify-content: center;
+                order: 3;
             }
-            
+
+            .map-container {
+                flex-direction: column;
+                height: auto;
+                padding: 10px;
+            }
+
             #map {
-                height: 60vh;
+                height: 400px;
+                order: 2;
+            }
+
+            .venue-list {
+                height: 300px;
+                order: 1;
+                margin-bottom: 20px;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .map-container {
+                padding: 15px;
+            }
+
+            .venue-list {
+                min-width: 300px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🎪 Family Fun Map v.4 🎪</h1>
-            <p>Indoor Play Places & Outdoor Adventures for Toddlers & Preschoolers (Ages 2-5)</p>
-            <p style="font-size: 1rem; margin-top: 5px;">Merrimack Valley, MA to Bloomfield, CT & Surrounding Areas</p>
-        </div>
+      <div class="header">
+          <h1>🎪 Family Fun Map 🎪</h1>
+          <p>Indoor Play Places & Outdoor Adventures for Toddlers & Preschoolers (Ages 2-5)</p>
+          <p style="font-size: 1rem; margin-top: 5px;">Merrimack Valley, MA to Bloomfield, CT & Surrounding Areas</p>
+      </div>
 
         <div class="controls">
-            <div class="filter-group">
-                <label>Show:</label>
-                <button class="filter-btn active" data-type="all">All Venues</button>
-                <button class="filter-btn" data-type="indoor">Indoor Play</button>
-                <button class="filter-btn" data-type="outdoor">Outdoor Fun</button>
-                <button class="filter-btn" data-type="fair">Fairs & Events</button>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-type="all">🌟 All Venues</button>
+                <button class="filter-btn" data-type="indoor">🏢 Indoor Fun</button>
+                <button class="filter-btn" data-type="outdoor">🌳 Outdoor Adventures</button>
+                <button class="filter-btn" data-type="fair">🎪 Fairs & Events</button>
+            </div>
+
+            <div class="sort-control">
+                <label for="sortSelect">Sort by:</label>
+                <select id="sortSelect">
+                    <option value="city" selected>City</option>
+                    <option value="name">Name</option>
+                    <option value="type">Type</option>
+                </select>
             </div>
 
             <div class="legend">
                 <div class="legend-item">
                     <div class="legend-icon indoor"></div>
-                    <span>Indoor Play Places</span>
+                    <span>Indoor Activities</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-icon outdoor"></div>
-                    <span>Outdoor Venues</span>
+                    <span>Outdoor Adventures</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-icon fair"></div>
                     <span>Fairs & Events</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-icon old-info"></div>
-                    <span>⏰ Location info last updated 12+ months ago</span>
+                    <div class="legend-icon old"></div>
+                    <span>Info 1+ year old</span>
                 </div>
             </div>
         </div>
 
-        <div id="map"></div>
-
-        <div class="footer">
-            <p><strong>Last Updated:</strong> August 27, 2025 | <strong>Note:</strong> Always verify hours, events, and pricing directly with venues before visiting.</p>
-            <p><strong>Sources:</strong> Original research + Community Kangaroo API (communitykangaroo.com)</p>
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="venue-list">
+                <div class="venue-count" id="venueCount">Loading venues...</div>
+                <div id="venueCards"></div>
+            </div>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Initialize the map
-        const map = L.map('map').setView([42.2, -71.4], 8);
-
-        // Add tile layer
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-
-        // Define custom icons
-        const createIcon = (color, isOld = false) => {
-            const icon = L.divIcon({
-                className: 'custom-marker',
-                html: `<div style="background-color: ${color}; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3); position: relative;">
-                    ${isOld ? '<div style="position: absolute; top: -5px; right: -5px; background: #f39c12; width: 10px; height: 10px; border-radius: 50%; border: 1px solid white;"></div>' : ''}
-                </div>`,
-                iconSize: [20, 20],
-                iconAnchor: [10, 10]
-            });
-            return icon;
-        };
-
-        const indoorIcon = createIcon('#3498db');
-        const outdoorIcon = createIcon('#2ecc71');
-        const fairIcon = createIcon('#e74c3c');
-        const oldIndoorIcon = createIcon('#3498db', true);
-        const oldOutdoorIcon = createIcon('#2ecc71', true);
-
-        // Venue data
+        // Comprehensive venue data from family_venues_map4.html
         const venues = [
             // ORIGINAL INDOOR VENUES - MASSACHUSETTS
             {
@@ -297,6 +484,16 @@
                 isOld: false
             },
             {
+                name: "The Butterfly Place",
+                lat: 42.5789, lng: -71.4298,
+                type: "indoor",
+                city: "Westford, MA",
+                ages: "All ages",
+                description: "Indoor tropical conservatory with up to 500 live butterflies from 50+ species. Walk winding pathways among freely-flying butterflies, koi fish, and quail birds in 80-85°F tropical environment.",
+                events: "Daily 10am-3:30pm, Valentine's Day through Columbus Day season, educational videos, show & tell bench with staff, butterfly life cycle exhibits, outdoor picnic area",
+                website: "https://butterflyplace-ma.com/",
+                isOld: false
+            },            {
                 name: "Discovery Museum",
                 lat: 42.4851, lng: -71.4416,
                 type: "indoor",
@@ -470,7 +667,7 @@
                 lat: 42.06687, lng: -71.10244,
                 type: "indoor",
                 city: "North Easton, MA",
-                ages: "All ages", 
+                ages: "All ages",
                 description: "Hands-on interactive museum with exhibits for early toddlers through school age. Tickets available at door only.",
                 events: "Tuesday-Friday 9:30am-3pm, weekends 12:30-4pm, interactive exhibits for all ages",
                 website: "http://childrensmuseumineaston.org/",
@@ -633,7 +830,7 @@
                 isOld: false
             },
 
-            // ORIGINAL OUTDOOR VENUES - MASSACHUSETTS  
+            // ORIGINAL OUTDOOR VENUES - MASSACHUSETTS
             {
                 name: "Davis Farmland",
                 lat: 42.3531, lng: -71.8023,
@@ -660,7 +857,7 @@
                 name: "Franklin Park Zoo",
                 lat: 42.3026, lng: -71.0851,
                 type: "outdoor",
-                city: "Boston, MA", 
+                city: "Boston, MA",
                 ages: "All ages",
                 description: "Zoo with Tropical Forest (gorillas, lemurs), Giraffe Savannah, nature play area perfect for toddlers.",
                 events: "Seasonal animal programs, educational activities, special exhibits",
@@ -672,7 +869,7 @@
                 lat: 42.0037, lng: -71.5640,
                 type: "outdoor",
                 city: "Mendon, MA",
-                ages: "All ages", 
+                ages: "All ages",
                 description: "New England's largest zoo with 850+ animals, Skyfari aerial tram, walk-through deer forest, hand-feed giraffes.",
                 events: "Animal encounters, feeding experiences, educational programs, Soaring Eagle zip ride",
                 website: "https://www.southwickszoo.com/",
@@ -692,7 +889,7 @@
             {
                 name: "The Zoo in Forest Park",
                 lat: 42.0977, lng: -72.5617,
-                type: "outdoor", 
+                type: "outdoor",
                 city: "Springfield, MA",
                 ages: "All ages",
                 description: "Zoo specializing in rescued animals within large urban park. Easy-to-navigate space with meaningful animal stories.",
@@ -701,10 +898,20 @@
                 isOld: false
             },
             {
+                name: "Springfield Museums/Dr. Seuss Museum",
+                lat: 42.1015, lng: -72.5898,
+                type: "indoor",
+                city: "Springfield, MA",
+                ages: "All ages",
+                description: "Five world-class museums under single admission including Amazing World of Dr. Seuss Museum, Science Museum with Spark!Lab, Fine Arts, History museums.",
+                events: "Interactive Dr. Seuss exhibits with climbing sculptures, hands-on activities, planetarium shows, live animals, dinosaur hall, rotating special exhibits",
+                website: "https://seussinspringfield.org/",
+                isOld: false
+            },            {
                 name: "World's End",
                 lat: 42.2537, lng: -70.8665,
                 type: "outdoor",
-                city: "Hingham, MA", 
+                city: "Hingham, MA",
                 ages: "All ages",
                 description: "Trustees property with 10 miles of family-friendly carriage paths, spectacular harbor views, rolling hills perfect for toddlers.",
                 events: "Family programs, easy walks, kite flying, picnicking areas",
@@ -715,7 +922,7 @@
                 name: "deCordova Sculpture Park",
                 lat: 42.4640, lng: -71.2836,
                 type: "outdoor",
-                city: "Lincoln, MA", 
+                city: "Lincoln, MA",
                 ages: "All ages",
                 description: "Trustees property with outdoor sculptures in landscape setting, 30 acres of trails, art and nature combined.",
                 events: "Art exhibitions, family programs, outdoor sculpture exploration",
@@ -726,7 +933,7 @@
                 name: "Robbins Farm Park",
                 lat: 42.4184, lng: -71.1562,
                 type: "outdoor",
-                city: "Arlington, MA", 
+                city: "Arlington, MA",
                 ages: "All ages",
                 description: "Huge playground with super long slides built into hillside, separate areas for toddlers/older kids, Boston skyline views.",
                 events: "Open year-round, great for kite flying, viewing Boston fireworks",
@@ -738,11 +945,22 @@
                 lat: 42.3656, lng: -71.1628,
                 type: "outdoor",
                 city: "Watertown, MA",
-                ages: "All ages", 
+                ages: "All ages",
                 description: "Beautiful green space on Charles River with separate playground areas for different ages, water features, picnic space.",
                 events: "Open year-round, walking/biking paths, ball fields available",
                 website: "https://www.watertown-ma.gov/",
                 isOld: true
+            },
+            {
+                name: "Universal Playground at 200 Trapelo Park",
+                lat: 42.3756, lng: -71.2356,
+                type: "outdoor",
+                city: "Waltham, MA",
+                ages: "All ages & abilities",
+                description: "New England's largest ADA-compliant universal playground with cushioned surfaces, sensory-friendly equipment, mini golf course, zipline, large play structures with shade nets. Built on historic Fernald Center site.",
+                events: "Weekend parking requires reservations (2-hour limit), spray pad closed 2025 but reopening 2026, daily 10am-7pm hours",
+                website: "https://www.city.waltham.ma.us/recreation-department",
+                isOld: false
             },
             {
                 name: "Esplanade Playgrounds",
@@ -1062,7 +1280,7 @@
                 ages: "All ages",
                 description: "Park with splash pad and outdoor preschool playground perfect for toddlers and young children.",
                 events: "Summer splash pad, preschool-focused playground equipment",
-                website: "https://northboroughma.myrec.com/",
+                website: "https://northboroughma.myrec.com/info/facilities/details.aspx?FacilityID=11152",
                 isOld: true
             },
             {
@@ -1167,7 +1385,7 @@
 
             // OUTDOOR VENUES - CONNECTICUT
             {
-                name: "Roaring Brook Nature Center", 
+                name: "Roaring Brook Nature Center",
                 lat: 41.8345, lng: -72.9023,
                 type: "outdoor",
                 city: "Canton, CT",
@@ -1180,7 +1398,7 @@
             {
                 name: "Westmoor Park",
                 lat: 41.7658, lng: -72.7420,
-                type: "outdoor", 
+                type: "outdoor",
                 city: "West Hartford, CT",
                 ages: "All ages",
                 description: "162-acre park with farm animals (horses, pigs, chickens, goats, llamas), wildflower meadows, woodland trails.",
@@ -1457,7 +1675,7 @@
                 name: "Brooklyn Fair",
                 lat: 41.7940, lng: -71.9440,
                 type: "fair",
-                city: "Brooklyn, CT", 
+                city: "Brooklyn, CT",
                 ages: "All ages",
                 description: "One of the oldest continuously run fairs in the US (Aug 21-24, 2025). Fireworks, racing pigs, kids' stage.",
                 events: "Baking contests, truck pull, animal competitions, entire kids' stage with activities",
@@ -1469,13 +1687,23 @@
                 lat: 41.9518, lng: -71.9674,
                 type: "fair",
                 city: "Woodstock, CT",
-                ages: "All ages", 
+                ages: "All ages",
                 description: "Labor Day tradition (Aug 28-Sept 1, 2025). Agricultural exhibits, birthing center, entertainment, carnival rides.",
                 events: "Agricultural competitions, entertainment, music, food, carnival rides, educational exhibits",
                 website: "https://www.woodstockfair.com/",
                 isOld: false
             },
             {
+                name: "Topsfield Fair",
+                lat: 42.6376, lng: -70.9495,
+                type: "fair",
+                city: "Topsfield, MA",
+                ages: "All ages",
+                description: "Historic agricultural fair with rides, animals, and competitions. One of America's oldest county fairs.",
+                events: "October 6-16, 2025 - Livestock shows, carnival rides, craft demonstrations, pumpkin weigh-off",
+                website: "https://topsfieldfair.org/",
+                isOld: false
+            },            {
                 name: "Connecticut Renaissance Faire",
                 lat: 41.6521, lng: -72.2173,
                 type: "fair",
@@ -1487,7 +1715,7 @@
                 isOld: false
             },
             {
-                name: "Wolcott Country Fair", 
+                name: "Wolcott Country Fair",
                 lat: 41.6029, lng: -72.9851,
                 type: "fair",
                 city: "Wolcott, CT",
@@ -1499,11 +1727,146 @@
             }
         ];
 
-        // Store all markers for filtering
-        let allMarkers = [];
+        // Sort venues alphabetically by city
+        venues.sort((a, b) => a.city.localeCompare(b.city));
 
-        // Add markers to map
-        venues.forEach(venue => {
+        // Initialize the map - adjusted for expanded New England coverage
+        const map = L.map('map').setView([42.2, -71.4], 8);
+
+        // Add OpenStreetMap tile layer
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Create custom icons
+        const createCustomIcon = (color, isOld = false) => {
+            const opacity = isOld ? 0.6 : 1.0;
+            return L.divIcon({
+                html: `<div style="
+                    background-color: ${color};
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    border: 3px solid white;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                    opacity: ${opacity};
+                "></div>`,
+                className: 'custom-marker',
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+            });
+        };
+
+        const indoorIcon = createCustomIcon('#3498db');
+        const outdoorIcon = createCustomIcon('#2ecc71');
+        const fairIcon = createCustomIcon('#e74c3c');
+        const oldIndoorIcon = createCustomIcon('#3498db', true);
+        const oldOutdoorIcon = createCustomIcon('#2ecc71', true);
+
+        // Store all markers and venue cards for filtering
+        let allMarkers = [];
+        let allVenueCards = [];
+
+        // Function to sort venues based on criteria
+        function sortVenues(criteria) {
+            switch(criteria) {
+                case 'name':
+                    venues.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+                case 'type':
+                    venues.sort((a, b) => {
+                        if (a.type !== b.type) {
+                            return a.type.localeCompare(b.type);
+                        }
+                        return a.name.localeCompare(b.name);
+                    });
+                    break;
+                case 'city':
+                default:
+                    venues.sort((a, b) => a.city.localeCompare(b.city));
+                    break;
+            }
+
+            // Regenerate venue cards
+            regenerateVenueCards();
+
+            // Update venue count
+            updateVenueCount();
+        }
+
+        // Function to regenerate venue cards after sorting
+        function regenerateVenueCards() {
+            const venueCardsContainer = document.getElementById('venueCards');
+            venueCardsContainer.innerHTML = '';
+
+            venues.forEach((venue, index) => {
+                venueCardsContainer.innerHTML += createVenueCard(venue, index);
+            });
+
+            // Re-add click handlers to new venue cards
+            document.querySelectorAll('.venue-card').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    const venueIndex = parseInt(card.dataset.venueIndex);
+                    const venue = venues[venueIndex];
+                    const marker = allMarkers[venueIndex];
+
+                    // Center map on the venue and zoom in
+                    map.setView([venue.lat, venue.lng], 12);
+
+                    // Open the marker popup
+                    marker.openPopup();
+
+                    // Highlight the card briefly
+                    card.style.background = '#e8f4fd';
+                    setTimeout(() => {
+                        card.style.background = 'white';
+                    }, 1000);
+                });
+            });
+
+            // Update allVenueCards reference
+            allVenueCards = document.querySelectorAll('.venue-card');
+
+            // Reapply current filter
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.type;
+            if (activeFilter !== 'all') {
+                allVenueCards.forEach(card => {
+                    const cardType = card.classList.contains('indoor') ? 'indoor' :
+                                   card.classList.contains('outdoor') ? 'outdoor' : 'fair';
+
+                    if (cardType !== activeFilter) {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+        }
+        function createVenueCard(venue, index) {
+            const oldIndicator = venue.isOld ? '<span class="old-info-indicator">⏰ 1+ yr old</span>' : '';
+            const typeText = venue.type === 'indoor' ? 'Indoor' : venue.type === 'outdoor' ? 'Outdoor' : 'Fair/Event';
+
+            return `
+                <div class="venue-card ${venue.type} ${venue.isOld ? 'old-info' : ''}" data-venue-index="${index}">
+                    <div class="venue-card-header">
+                        <h3 class="venue-card-title">${venue.name}${oldIndicator}</h3>
+                        <span class="venue-card-type ${venue.type}">${typeText}</span>
+                    </div>
+                    <div class="venue-card-city">📍 ${venue.city}</div>
+                    <div class="venue-card-ages">Ages ${venue.ages}</div>
+                    <a href="${venue.website}" target="_blank" class="venue-card-link" onclick="event.stopPropagation();">
+                        🌐 Visit Website
+                    </a>
+                </div>
+            `;
+        }
+
+        // Function to update venue count
+        function updateVenueCount() {
+            const visibleCards = document.querySelectorAll('.venue-card:not([style*="display: none"])').length;
+            document.getElementById('venueCount').textContent = `${visibleCards} venues found`;
+        }
+
+        // Add markers to map and create cards
+        venues.forEach((venue, index) => {
             let icon;
             if (venue.type === 'indoor') {
                 icon = venue.isOld ? oldIndoorIcon : indoorIcon;
@@ -1514,9 +1877,9 @@
             }
 
             const marker = L.marker([venue.lat, venue.lng], { icon: icon }).addTo(map);
-            
-            const oldBadge = venue.isOld ? '<span class="old-info-badge">⏰ last update 12+ months ago</span>' : '';
-            
+
+            const oldBadge = venue.isOld ? '<span class="old-info-badge">⏰ 1+ yr old info</span>' : '';
+
             const popupContent = `
                 <div class="popup-content">
                     <div class="popup-title">${venue.name}${oldBadge}</div>
@@ -1536,11 +1899,45 @@
                     </div>
                 </div>
             `;
-            
+
             marker.bindPopup(popupContent);
             marker.venueType = venue.type;
+            marker.venueIndex = index;
             allMarkers.push(marker);
         });
+
+        // Generate venue cards
+        const venueCardsContainer = document.getElementById('venueCards');
+        venues.forEach((venue, index) => {
+            venueCardsContainer.innerHTML += createVenueCard(venue, index);
+        });
+
+        // Add click handlers to venue cards
+        document.querySelectorAll('.venue-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                const venueIndex = parseInt(card.dataset.venueIndex);
+                const venue = venues[venueIndex];
+                const marker = allMarkers[venueIndex];
+
+                // Center map on the venue and zoom in
+                map.setView([venue.lat, venue.lng], 12);
+
+                // Open the marker popup
+                marker.openPopup();
+
+                // Highlight the card briefly
+                card.style.background = '#e8f4fd';
+                setTimeout(() => {
+                    card.style.background = 'white';
+                }, 1000);
+            });
+        });
+
+        // Store all venue cards for filtering
+        allVenueCards = document.querySelectorAll('.venue-card');
+
+        // Update initial venue count
+        updateVenueCount();
 
         // Filter functionality
         document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -1548,9 +1945,9 @@
                 // Update active button
                 document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
-                
+
                 const filterType = e.target.dataset.type;
-                
+
                 // Show/hide markers
                 allMarkers.forEach(marker => {
                     if (filterType === 'all' || marker.venueType === filterType) {
@@ -1559,12 +1956,28 @@
                         map.removeLayer(marker);
                     }
                 });
+
+                // Show/hide venue cards
+                allVenueCards.forEach(card => {
+                    const cardType = card.classList.contains('indoor') ? 'indoor' :
+                                   card.classList.contains('outdoor') ? 'outdoor' : 'fair';
+
+                    if (filterType === 'all' || cardType === filterType) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                // Update venue count
+                updateVenueCount();
             });
         });
 
-        // Fit map to show all markers
-        const group = new L.featureGroup(allMarkers);
-        map.fitBounds(group.getBounds().pad(0.1));
+        // Sort functionality
+        document.getElementById('sortSelect').addEventListener('change', (e) => {
+            sortVenues(e.target.value);
+        });
     </script>
 </body>
 </html>
