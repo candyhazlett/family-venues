@@ -211,7 +211,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎪 Family Fun Map 🎪</h1>
+            <h1>🎪 Family Fun Map v.4 🎪</h1>
             <p>Indoor Play Places & Outdoor Adventures for Toddlers & Preschoolers (Ages 2-5)</p>
             <p style="font-size: 1rem; margin-top: 5px;">Merrimack Valley, MA to Bloomfield, CT & Surrounding Areas</p>
         </div>
@@ -249,13 +249,14 @@
 
         <div class="footer">
             <p><strong>Last Updated:</strong> August 27, 2025 | <strong>Note:</strong> Always verify hours, events, and pricing directly with venues before visiting.</p>
+            <p><strong>Sources:</strong> Original research + Community Kangaroo API (communitykangaroo.com)</p>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <script>
         // Initialize the map
-        const map = L.map('map').setView([42.0, -71.5], 9);
+        const map = L.map('map').setView([42.2, -71.4], 8);
 
         // Add tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -283,7 +284,7 @@
 
         // Venue data
         const venues = [
-            // INDOOR VENUES - MASSACHUSETTS
+            // ORIGINAL INDOOR VENUES - MASSACHUSETTS
             {
                 name: "Boston Children's Museum",
                 lat: 42.3519, lng: -71.0495,
@@ -417,17 +418,6 @@
                 isOld: false
             },
             {
-                name: "Springfield Museums/Dr. Seuss Museum",
-                lat: 42.1015, lng: -72.5898,
-                type: "indoor",
-                city: "Springfield, MA",
-                ages: "All ages",
-                description: "Five world-class museums under single admission including Amazing World of Dr. Seuss Museum, Science Museum with Spark!Lab, Fine Arts, History museums.",
-                events: "Interactive Dr. Seuss exhibits with climbing sculptures, hands-on activities, planetarium shows, live animals, dinosaur hall, rotating special exhibits",
-                website: "https://seussinspringfield.org/",
-                isOld: false
-            },
-            {
                 name: "Cedarland (aMAZEment Action)",
                 lat: 42.7762, lng: -71.0773,
                 type: "indoor",
@@ -437,6 +427,197 @@
                 events: "Open play, birthday parties, group events",
                 website: "https://www.cedarland.com/",
                 isOld: false
+            },
+
+            // WESTFORD AREA VENUES
+            {
+                name: "Kimball Farm",
+                lat: 42.5751, lng: -71.4384,
+                type: "outdoor",
+                city: "Westford, MA",
+                ages: "All ages",
+                description: "50 acres of family fun with 50+ ice cream flavors, mini golf, bumper boats, batting cages, zip line, nine-hole pitch & putt course.",
+                events: "Mini golf, bumper boats, batting cages, zip line, homemade ice cream, outdoor dining",
+                website: "https://kimballfarm.com/location/westford/",
+                isOld: false
+            },
+            {
+                name: "Good Pickin' Farm",
+                lat: 42.5845, lng: -71.4201,
+                type: "outdoor",
+                city: "Westford, MA",
+                ages: "All ages",
+                description: "Educational farm with goat hikes, alpaca adventures, horseback riding, farm animals, seasonal activities. Scheduled visits required.",
+                events: "Mornings on the Farm (ages 18mo-5yrs), goat hikes, alpaca adventures, birthday parties, educational programs",
+                website: "https://www.goodpickinfarm.com/",
+                isOld: false
+            },
+            {
+                name: "We Rock the Spectrum Westford",
+                lat: 42.5734, lng: -71.4298,
+                type: "indoor",
+                city: "Westford, MA",
+                ages: "All ages",
+                description: "Inclusive sensory gym with swings, trampoline, climbing structures, zip line, crash pit, climbing wall. Autism-friendly environment.",
+                events: "Open play, birthday parties, sensory classes, drop-off respite care, field trips",
+                website: "https://werockthespectrumwestford.com/",
+                isOld: false
+            },
+            {
+                name: "We Rock the Spectrum Wellesley",
+                lat: 42.2967, lng: -71.2929,
+                type: "indoor",
+                city: "Wellesley, MA",
+                ages: "0-12",
+                description: "Inclusive sensory gym with zip line, trampoline, arts & crafts, calming room. Safe space for children of all abilities.",
+                events: "Open play 9am-7pm daily, ABC dance classes, music therapy, Zumbini classes (ages 0-4), birthday parties",
+                website: "https://www.werockthespectrumwellesley.com/",
+                isOld: false
+            },
+
+            // NEW INDOOR VENUES FROM COMMUNITY KANGAROO
+            {
+                name: "Children's Museum in Easton",
+                lat: 42.06687, lng: -71.10244,
+                type: "indoor",
+                city: "North Easton, MA",
+                ages: "All ages", 
+                description: "Hands-on interactive museum with exhibits for early toddlers through school age. Tickets available at door only.",
+                events: "Tuesday-Friday 9:30am-3pm, weekends 12:30-4pm, interactive exhibits for all ages",
+                website: "http://childrensmuseumineaston.org/",
+                isOld: true
+            },
+            {
+                name: "Jam Time Natick Mall",
+                lat: 42.301113, lng: -71.381917,
+                type: "indoor",
+                city: "Natick, MA",
+                ages: "0-12",
+                description: "Large indoor play area with tree house, bouncy house, variety of toys. Located on upper level of Natick Mall.",
+                events: "Daily drop-in play, birthday parties available, mall convenience for shopping",
+                website: "https://jamtime.com/",
+                isOld: true
+            },
+            {
+                name: "Launch Trampoline Park Norwood",
+                lat: 42.191988, lng: -71.182691,
+                type: "indoor",
+                city: "Norwood, MA",
+                ages: "All ages",
+                description: "Trampoline courts, dodgeball, ninja course, arcade, and food. Special toddler times on weekend mornings.",
+                events: "Toddler Time weekend mornings, birthday parties, arcade games",
+                website: "https://launchtrampolinepark.com/norwood/",
+                isOld: true
+            },
+            {
+                name: "Children's World Canton",
+                lat: 42.166702, lng: -71.110916,
+                type: "indoor",
+                city: "Canton, MA",
+                ages: "All ages",
+                description: "Bounce houses, train table, dome climber, ride-on vehicles, mini trampoline, play house and more for active toddlers.",
+                events: "Drop-in play sessions, birthday parties, variety of age-appropriate toys",
+                website: "http://www.childrensworldplay.com/",
+                isOld: true
+            },
+            {
+                name: "Kidsports Stoughton",
+                lat: 42.132021, lng: -71.118706,
+                type: "indoor",
+                city: "Stoughton, MA",
+                ages: "All ages",
+                description: "Indoor playground and inflatables with general admission; add-ons for bowling, plaster painting, laser tag.",
+                events: "Open play sessions, birthday parties, multiple activity options",
+                website: "https://kidsportsfun.com/",
+                isOld: true
+            },
+            {
+                name: "Monster Mini Golf Norwood",
+                lat: 42.160282, lng: -71.199683,
+                type: "indoor",
+                city: "Norwood, MA",
+                ages: "All ages",
+                description: "Indoor family-friendly monster-themed glow-in-the-dark 18 hole mini-golf and arcade.",
+                events: "Glow-in-the-dark mini-golf, arcade games, family entertainment",
+                website: "http://www.monsterminigolf.com/norwood/",
+                isOld: true
+            },
+            {
+                name: "Trombetta's Farm",
+                lat: 42.342908, lng: -71.512818,
+                type: "indoor",
+                city: "Marlborough, MA",
+                ages: "All ages",
+                description: "Indoor mini-golf and huge selection of ice cream. Open year-round for family fun.",
+                events: "Year-round indoor mini-golf, ice cream treats, family activities",
+                website: "http://www.trombettasfarm.com/",
+                isOld: true
+            },
+            {
+                name: "PiNZ Entertainment",
+                lat: 42.130162, lng: -71.51853,
+                type: "indoor",
+                city: "Milford, MA",
+                ages: "All ages",
+                description: "Ten-pin bowling, laser tag, arcades, virtual reality entertainment center.",
+                events: "Family bowling, laser tag games, arcade fun, virtual reality experiences",
+                website: "http://www.pinzbowl.com/milford",
+                isOld: true
+            },
+            {
+                name: "Kings Bowling Dedham",
+                lat: 42.22959, lng: -71.177006,
+                type: "indoor",
+                city: "Dedham, MA",
+                ages: "All ages",
+                description: "Family bowling until 5PM with Skee Ball, billiards and more. $6 per game, $4 shoe and $3 sock rental.",
+                events: "Family bowling sessions, Skee Ball, arcade games, birthday parties",
+                website: "http://kingsbowlamerica.com/dedham/",
+                isOld: true
+            },
+            {
+                name: "Needham Bowlaway",
+                lat: 42.279871, lng: -71.236832,
+                type: "indoor",
+                city: "Needham, MA",
+                ages: "All ages",
+                description: "Candlepin bowling with eight lanes. Cosmic Bowling Friday and Saturdays. Bumpers available for kids.",
+                events: "Cosmic Bowling weekends, family-friendly candlepin bowling, kids bumpers available",
+                website: "http://www.needhambowl.com/",
+                isOld: true
+            },
+            {
+                name: "Ryan Family Amusements",
+                lat: 42.162325, lng: -71.369988,
+                type: "indoor",
+                city: "Millis, MA",
+                ages: "All ages",
+                description: "Candlepin bowling and game room with arcade games for family entertainment.",
+                events: "Candlepin bowling, arcade games, family entertainment",
+                website: "http://ryanfamily.com/locations/bowling/millis/",
+                isOld: true
+            },
+            {
+                name: "Plaster Fun Time",
+                lat: 42.369451, lng: -71.218714,
+                type: "indoor",
+                city: "Waltham, MA",
+                ages: "All ages",
+                description: "Choose completed plaster items to paint and bring home. Walk-ins always welcome, great for toddler creativity.",
+                events: "Drop-in pottery painting, birthday parties available, toddler-friendly projects",
+                website: "https://plasterfuntime.com/locations/waltham/",
+                isOld: true
+            },
+            {
+                name: "The Pottery Place",
+                lat: 42.185897, lng: -71.306624,
+                type: "indoor",
+                city: "Medfield, MA",
+                ages: "All ages",
+                description: "Drop in and choose pottery pieces to paint - mugs, piggy banks, boxes, figurines perfect for little artists.",
+                events: "Drop-in pottery painting, toddler-friendly projects, creative activities",
+                website: "https://parkstreetbooks.com/pages/the-pottery-place-psb",
+                isOld: true
             },
 
             // INDOOR VENUES - CONNECTICUT
@@ -463,7 +644,7 @@
                 isOld: false
             },
 
-            // OUTDOOR VENUES - MASSACHUSETTS  
+            // ORIGINAL OUTDOOR VENUES - MASSACHUSETTS  
             {
                 name: "Davis Farmland",
                 lat: 42.3531, lng: -71.8023,
@@ -504,7 +685,7 @@
                 city: "Mendon, MA",
                 ages: "All ages", 
                 description: "New England's largest zoo with 850+ animals, Skyfari aerial tram, walk-through deer forest, hand-feed giraffes.",
-                events: "Educational programs, seasonal events, giraffe feeding experiences",
+                events: "Animal encounters, feeding experiences, educational programs, Soaring Eagle zip ride",
                 website: "https://www.southwickszoo.com/",
                 isOld: false
             },
@@ -619,17 +800,6 @@
                 isOld: false
             },
             {
-                name: "EcoTarium",
-                lat: 42.2626, lng: -71.8023,
-                type: "outdoor",
-                city: "Worcester, MA",
-                ages: "All ages",
-                description: "Indoor-outdoor science and nature museum on 45+ acres. Three floors of interactive exhibits, live animal habitats, digital planetarium, nature trails, seasonal train rides.",
-                events: "Live mountain lions, otters, reptiles, birds at Wild Cat Station. Breakfast with Otters program, Explorer Express Train rides, seasonal events (Mud Day, Insect Day, Rocket Day)",
-                website: "https://ecotarium.org/",
-                isOld: false
-            },
-            {
                 name: "Mary Cummings Park",
                 lat: 42.5024, lng: -71.1545,
                 type: "outdoor",
@@ -639,6 +809,371 @@
                 events: "0.8-mile accessible loop trail, family programs, nature exploration",
                 website: "https://thetrustees.org/place/mary-cummings-park/",
                 isOld: false
+            },
+
+            // NEW OUTDOOR VENUES FROM COMMUNITY KANGAROO
+            {
+                name: "Norfolk Community Park",
+                lat: 42.124221, lng: -71.329376,
+                type: "outdoor",
+                city: "Norfolk, MA",
+                ages: "0-5",
+                description: "Fenced-in playground specifically designed for younger preschool-aged kids, soft turf surface, many toddler structures.",
+                events: "Open year-round, safe fenced environment, toddler-focused equipment",
+                website: "https://www.norfolkma.org/",
+                isOld: true
+            },
+            {
+                name: "Sherborn Playground",
+                lat: 42.245792, lng: -71.367958,
+                type: "outdoor",
+                city: "Sherborn, MA",
+                ages: "All ages",
+                description: "Rebuilt playground with options for all ages. Very shady and fenced in. Wheelchair/stroller accessible areas.",
+                events: "Open year-round, fully rebuilt in 2015, accessible features",
+                website: "https://www.sherbornma.org/",
+                isOld: true
+            },
+            {
+                name: "Bird Park (Francis William Bird Park)",
+                lat: 42.154253, lng: -71.214579,
+                type: "outdoor",
+                city: "Walpole, MA",
+                ages: "All ages",
+                description: "Large Trustees park with accessible trails, frog ponds, toddler playground with swings. Paved area with ride-on toys to borrow.",
+                events: "Year-round access, Trustees programs, frog pond exploration, ride-on toys available",
+                website: "https://thetrustees.org/place/francis-william-bird-park/",
+                isOld: true
+            },
+            {
+                name: "Choate Park Playground and Splash Pad",
+                lat: 42.147304, lng: -71.429551,
+                type: "outdoor",
+                city: "Medway, MA",
+                ages: "All ages",
+                description: "Fully rebuilt in 2018 with large multi-age playground and summer splash pad for cooling off.",
+                events: "Summer splash pad operation, year-round playground access, modern equipment",
+                website: "https://medwayma.myrec.com/",
+                isOld: true
+            },
+            {
+                name: "Natick Community Organic Farm",
+                lat: 42.267865, lng: -71.322127,
+                type: "outdoor",
+                city: "Natick, MA",
+                ages: "All ages",
+                description: "Working farm with sheep, goats, pigs, rabbits, chickens & turkeys to watch. Free entry, self-service market stand.",
+                events: "Free access 8am-dusk daily, seasonal farming activities, real farm animals",
+                website: "http://www.natickfarm.org/",
+                isOld: true
+            },
+            {
+                name: "Belkin Family Lookout Farm",
+                lat: 42.263076, lng: -71.309116,
+                type: "outdoor",
+                city: "Natick, MA",
+                ages: "All ages",
+                description: "U-pick fruit farm with playground, bounce pad, small train. Outdoor dining and live music. Seasonal activities.",
+                events: "Seasonal u-pick activities, playground during u-pick season, family entertainment",
+                website: "http://lookoutfarm.com/",
+                isOld: true
+            },
+            {
+                name: "Wards Berry Farm",
+                lat: 42.098932, lng: -71.216796,
+                type: "outdoor",
+                city: "Sharon, MA",
+                ages: "All ages",
+                description: "Pick your own berries, animals to see, large climbing structure, toddler play area, bouncy pillow, hayrides.",
+                events: "Seasonal pick-your-own activities, public hayrides, bouncy pillow fun, private parties",
+                website: "http://wardsberryfarm.com/",
+                isOld: true
+            },
+            {
+                name: "Stone Zoo",
+                lat: 42.46276, lng: -71.093921,
+                type: "outdoor",
+                city: "Stoneham, MA",
+                ages: "All ages",
+                description: "Medium-sized zoo perfect for young kids with polar bears, black bears, jaguar, lynx, wolves, and other animals.",
+                events: "Year-round operation, educational programs, animal viewing perfect for toddlers",
+                website: "http://zoonewengland.org/",
+                isOld: true
+            },
+            {
+                name: "Powisset Farm",
+                lat: 42.225507, lng: -71.260355,
+                type: "outdoor",
+                city: "Dover, MA",
+                ages: "All ages",
+                description: "Small-scale Trustees community farm with pigs and chickens to see, small play area with swingset and tires.",
+                events: "Farm animal viewing, small playground area, Trustees programs",
+                website: "http://www.thetrustees.org/places-to-visit/greater-boston/powisset-farm.html",
+                isOld: true
+            },
+            {
+                name: "Crescent Ridge Dairy",
+                lat: 42.128521, lng: -71.148819,
+                type: "outdoor",
+                city: "Sharon, MA",
+                ages: "All ages",
+                description: "Ice cream counter open year-round with picnic tables, cows and goats outside to watch while enjoying treats.",
+                events: "Year-round ice cream, farm animal viewing, picnic area",
+                website: "http://www.crescentridge.com/",
+                isOld: true
+            },
+            {
+                name: "Tougas Farm",
+                lat: 42.345383, lng: -71.679489,
+                type: "outdoor",
+                city: "Northborough, MA",
+                ages: "All ages",
+                description: "U-Pick apples, pumpkins, peaches, berries, cherries. See pigs, goats, ducks, chickens. Playground with antique tractor.",
+                events: "Seasonal u-pick activities, farm animal viewing, playground with tractor",
+                website: "http://tougasfamilyfarm.com/",
+                isOld: true
+            },
+            {
+                name: "Capron Park Zoo",
+                lat: 41.93721, lng: -71.29477,
+                type: "outdoor",
+                city: "Attleboro, MA",
+                ages: "All ages",
+                description: "Small zoo perfect for young kids with llamas, goats to feed, kangaroos, snakes, lions, leopards. Summer splash pad.",
+                events: "Animal feeding opportunities, summer splash pad, educational programs",
+                website: "http://www.capronparkzoo.com/",
+                isOld: true
+            },
+            {
+                name: "Adams Farm",
+                lat: 42.013729, lng: -71.401494,
+                type: "outdoor",
+                city: "Cumberland, RI",
+                ages: "All ages",
+                description: "Huge selection of pumpkins, apples, corn with free corn and hay mazes. Petting zoo to feed goats, cows, ducks, pigs.",
+                events: "Free corn and hay mazes, petting zoo feeding opportunities, seasonal produce",
+                website: "http://www.adamsfarmri.com/",
+                isOld: true
+            },
+            {
+                name: "EcoTarium",
+                lat: 42.264101, lng: -71.766066,
+                type: "outdoor",
+                city: "Worcester, MA",
+                ages: "All ages",
+                description: "Interactive indoor and outdoor exhibits providing unique hands-on education. Perfect for curious toddlers and preschoolers.",
+                events: "Interactive outdoor exhibits, educational programs, nature exploration",
+                website: "http://www.ecotarium.org/",
+                isOld: true
+            },
+            {
+                name: "Moose Hill Wildlife Sanctuary",
+                lat: 42.123719, lng: -71.207847,
+                type: "outdoor",
+                city: "Sharon, MA",
+                ages: "All ages",
+                description: "Mass Audubon sanctuary with trails through forests, fields, and swamp boardwalk perfect for nature exploration.",
+                events: "Nature programs, guided walks, wildlife observation, educational activities",
+                website: "http://www.massaudubon.org/get-outdoors/wildlife-sanctuaries/moose-hill",
+                isOld: true
+            },
+            {
+                name: "Stony Brook Wildlife Sanctuary",
+                lat: 42.107869, lng: -71.317503,
+                type: "outdoor",
+                city: "Norfolk, MA",
+                ages: "All ages",
+                description: "Extensive boardwalk system through open land, wooded areas, wetlands, island, and waterfall. Fee for non-members.",
+                events: "Boardwalk trails, waterfall viewing, nature education programs",
+                website: "http://www.massaudubon.org/get-outdoors/wildlife-sanctuaries/stony-brook",
+                isOld: true
+            },
+            {
+                name: "Blue Hills Reservation",
+                lat: 42.214471, lng: -71.093704,
+                type: "outdoor",
+                city: "Milton, MA",
+                ages: "All ages",
+                description: "Hike up large hill with stone tower at top for great Boston skyline views. Free access.",
+                events: "Tower climbing, Boston skyline views, hiking programs, year-round access",
+                website: "http://www.mass.gov/eea/agencies/dcr/massparks/region-south/blue-hills-reservation.html",
+                isOld: true
+            },
+            {
+                name: "Houghton's Pond",
+                lat: 42.208186, lng: -71.094527,
+                type: "outdoor",
+                city: "Milton, MA",
+                ages: "All ages",
+                description: "Great free beach for kids with roped swimming area (up to 3 ft), lifeguards, sand, picnic area, bathhouse.",
+                events: "Swimming season with lifeguards, easy pond loop hike, picnic areas",
+                website: "http://www.mass.gov/eea/agencies/dcr/massparks/region-south/houghtons-pond-recreation-area.html",
+                isOld: true
+            },
+            {
+                name: "Ashland State Park",
+                lat: 42.246222, lng: -71.475813,
+                type: "outdoor",
+                city: "Ashland, MA",
+                ages: "All ages",
+                description: "Beach on Ashland Reservoir with swimming area. Daily fee for beautiful lakeside family time.",
+                events: "Swimming season, reservoir beach access, hiking trails",
+                website: "http://www.mass.gov/eea/agencies/dcr/massparks/region-north/ashland-state-park.html",
+                isOld: true
+            },
+            {
+                name: "DelCarte Conservation Area",
+                lat: 42.097904, lng: -71.381043,
+                type: "outdoor",
+                city: "Franklin, MA",
+                ages: "All ages",
+                description: "Playground for big and little kids with network of trails around Franklin Reservoirs. Great for nature walks.",
+                events: "Year-round access, marked trails, fishing opportunities, nature exploration",
+                website: "https://www.franklinma.gov/",
+                isOld: true
+            },
+            {
+                name: "Kasper Playground and Silver Lake Beach",
+                lat: 42.059853, lng: -71.464252,
+                type: "outdoor",
+                city: "Bellingham, MA",
+                ages: "All ages",
+                description: "Splash pad, sandy beach, huge playground and fishing. Lifeguards on duty late June through Labor Day.",
+                events: "Summer splash pad and beach with lifeguards, playground year-round, fishing",
+                website: "https://www.bellinghamma.org/",
+                isOld: true
+            },
+            {
+                name: "Stoddard Park",
+                lat: 42.188275, lng: -71.415994,
+                type: "outdoor",
+                city: "Holliston, MA",
+                ages: "All ages",
+                description: "Beach and large multi-age playground with BBQ and picnic area. Pass required mid-June through August.",
+                events: "Summer beach access, year-round playground, BBQ and picnic facilities",
+                website: "https://www.townofholliston.us/",
+                isOld: true
+            },
+            {
+                name: "Ghiloni Park",
+                lat: 42.356039, lng: -71.521828,
+                type: "outdoor",
+                city: "Marlborough, MA",
+                ages: "All ages",
+                description: "Big multi-age playground with large splash pad open during summer months for cooling off.",
+                events: "Summer splash pad operation, year-round playground access",
+                website: "https://mrd.recdesk.com/",
+                isOld: true
+            },
+            {
+                name: "Assabet Park",
+                lat: 42.318439, lng: -71.643797,
+                type: "outdoor",
+                city: "Northborough, MA",
+                ages: "All ages",
+                description: "Park with splash pad and outdoor preschool playground perfect for toddlers and young children.",
+                events: "Summer splash pad, preschool-focused playground equipment",
+                website: "https://northboroughma.myrec.com/",
+                isOld: true
+            },
+            {
+                name: "Cristoforo Colombo East Park",
+                lat: 42.267671, lng: -71.786432,
+                type: "outdoor",
+                city: "Worcester, MA",
+                ages: "All ages",
+                description: "Large spray park and playground perfect for families with young children to cool off and play.",
+                events: "Spray park operation, playground activities, family recreation",
+                website: "http://www.worcesterma.gov/",
+                isOld: true
+            },
+            {
+                name: "Cellucci Skate and Splash Park",
+                lat: 42.390285, lng: -71.567667,
+                type: "outdoor",
+                city: "Hudson, MA",
+                ages: "All ages",
+                description: "Playground and splash pad combination perfect for summer family fun and active play.",
+                events: "Summer splash pad, playground year-round, skating opportunities",
+                website: "https://hudsonrecreation.recdesk.com/",
+                isOld: true
+            },
+            {
+                name: "Briggs Playground and Pool",
+                lat: 41.939301, lng: -71.280467,
+                type: "outdoor",
+                city: "Attleboro, MA",
+                ages: "2-12",
+                description: "Fenced age 2-5 playground surrounded by older kid structures. Outdoor pool ($10 adult, $5 child).",
+                events: "Summer pool access, fenced toddler area, zip line for older kids",
+                website: "http://www.cityofattleboro.us/",
+                isOld: true
+            },
+            {
+                name: "William L Chase Arena",
+                lat: 42.271423, lng: -71.364994,
+                type: "outdoor",
+                city: "Natick, MA",
+                ages: "All ages",
+                description: "Public ice skating Sunday-Friday. Entry fee plus skate rental fee for family ice skating fun.",
+                events: "Public skating sessions, family ice skating, skate rentals available",
+                website: "http://fmcicesports.com/rink/natick-william-l-chase-arena/",
+                isOld: true
+            },
+            {
+                name: "Foxboro Sports Center",
+                lat: 42.062168, lng: -71.228704,
+                type: "outdoor",
+                city: "Foxboro, MA",
+                ages: "All ages",
+                description: "Public ice skating on Sundays and additional days during school vacations.",
+                events: "Sunday public skating, additional vacation day sessions",
+                website: "http://www.foxborosportscenter.com/",
+                isOld: true
+            },
+            {
+                name: "Norfolk Ice Arena",
+                lat: 42.133374, lng: -71.360946,
+                type: "outdoor",
+                city: "Norfolk, MA",
+                ages: "All ages",
+                description: "Public skating Sundays 1-3pm. Special rates for Norfolk residents, skate rentals available.",
+                events: "Sunday afternoon public skating, resident discounts, family ice skating",
+                website: "https://norfolkarena.com/",
+                isOld: true
+            },
+            {
+                name: "Miniature Golf on the Village Green",
+                lat: 42.303415, lng: -71.337683,
+                type: "outdoor",
+                city: "Natick, MA",
+                ages: "All ages",
+                description: "Outdoor mini-golf perfect for families. Hours: Sun-Thurs 10am-9pm, Fri & Sat 10am-10pm.",
+                events: "Daily outdoor mini-golf, family-friendly course design",
+                website: "https://www.gamesandgolf.com/FG/golf-on-the-village-green/",
+                isOld: true
+            },
+            {
+                name: "Putts & More",
+                lat: 42.235689, lng: -71.432999,
+                type: "outdoor",
+                city: "Holliston, MA",
+                ages: "All ages",
+                description: "Outdoor mini golf, jumping pillow, and splash pad - perfect triple threat for toddler entertainment.",
+                events: "Mini-golf, jumping pillow fun, summer splash pad",
+                website: "http://www.puttsandmore.com/",
+                isOld: true
+            },
+            {
+                name: "McGolf",
+                lat: 42.266577, lng: -71.176107,
+                type: "outdoor",
+                city: "Dedham, MA",
+                ages: "All ages",
+                description: "Outdoor mini-golf and driving range perfect for family entertainment and introducing kids to golf.",
+                events: "Mini-golf courses, driving range, family golf introduction",
+                website: "http://www.mcgolfonline.com/",
+                isOld: true
             },
 
             // OUTDOOR VENUES - CONNECTICUT
@@ -753,6 +1288,19 @@
                 events: "Free play during mall hours, educational S.T.E.A.M. activities",
                 website: "https://www.simon.com/mall/south-shore-plaza/stores/play-area",
                 isOld: false
+            },
+
+            // NEW SOUTH SHORE VENUES FROM COMMUNITY KANGAROO
+            {
+                name: "Jam Time Hanover",
+                lat: 42.1537277, lng: -70.85441469999999,
+                type: "indoor",
+                city: "Hanover, MA",
+                ages: "0-6",
+                description: "Wooden play structures, bouncy house, variety of toys, infant zone. Perfect for ages 6 and under with daily drop-in play.",
+                events: "Daily drop-in play, birthday parties, age-appropriate toy variety",
+                website: "http://www.jamtime.com/",
+                isOld: true
             },
 
             // PROVIDENCE & RHODE ISLAND VENUES
@@ -906,17 +1454,6 @@
 
             // MAJOR FAIRS & FESTIVALS
             {
-                name: "Topsfield Fair",
-                lat: 42.6379, lng: -70.9489,
-                type: "fair",
-                city: "Topsfield, MA",
-                ages: "All ages",
-                description: "America's oldest county fair (since 1818). Ten-day event (Oct 3-13, 2025) with 450,000-500,000 visitors. Midway/carnival rides, agricultural exhibits, animal shows.",
-                events: "Kiddie Land opens daily 10am, Fiesta Shows carnival, animal exhibits, pig races, traditional fair food, pumpkin competitions, train displays",
-                website: "https://www.topsfieldfair.org/",
-                isOld: false
-            },
-            {
                 name: "The Big E",
                 lat: 42.1015, lng: -72.6398,
                 type: "fair",
@@ -989,7 +1526,7 @@
 
             const marker = L.marker([venue.lat, venue.lng], { icon: icon }).addTo(map);
             
-            const oldBadge = venue.isOld ? '<span class="old-info-badge">⏰ 1+ yr old info</span>' : '';
+            const oldBadge = venue.isOld ? '<span class="old-info-badge">⏰ Location info has not been updated in over a year</span>' : '';
             
             const popupContent = `
                 <div class="popup-content">
